@@ -8,7 +8,7 @@ Collaborators:
 Response to Exercise 1:
 
 The name of the scheduling algorithm is:
-
+This is cooperative scheduling. If you look at schedos-1.c, it calls sys_yield()after each character it prints. The scheduler then use a round-robin scheduling algorithm to pick the next available (runnable) process to run. Hence the output of "123412341234...".
 
 (Exercise 2 is a coding exercise)
 

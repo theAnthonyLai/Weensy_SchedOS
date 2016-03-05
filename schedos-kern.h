@@ -27,6 +27,8 @@ typedef struct process {
 	registers_t p_registers;	// Current process state: registers,
 					// stack location, EIP, etc.
 					// 'registers_t' defined in x86.h
+	
+	int p_priority;			// for 4A
 
 	procstate_t p_state;		// Process state; see above
 	int p_exit_status;		// Process's exit status

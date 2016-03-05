@@ -177,11 +177,14 @@ interrupt(registers_t *reg)
 		current->p_exit_status = reg->reg_eax;
 		schedule();
 
-	case INT_SYS_USER1:
+	//case INT_SYS_USER1:
+	case INT_SYS_PRIORITY:
 		// 'sys_user*' are provided for your convenience, in case you
 		// want to add a system call.
 		/* Your code here (if you want). */
-		run(current);
+		//run(current);
+		current->p_priority = reg->reg_eax;
+		schedule();
 
 	case INT_SYS_USER2:
 		/* Your code here (if you want). */

@@ -34,6 +34,7 @@ start(void)
 	int i;
 	//sys_priority(5);
 	//sys_share(2);
+	//sys_lottery(5);
 	for (i = 0; i < RUNCOUNT; i++) {
 		while(atomic_swap(&cursorposLock, 1));
 		// Write characters to the console, yielding after each one.

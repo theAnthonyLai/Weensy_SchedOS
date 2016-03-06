@@ -88,8 +88,8 @@ start(void)
 
 	// Set up hardware (schedos-x86.c)
 	segments_init();
-	//interrupt_controller_init(0);
-	interrupt_controller_init(1);
+	interrupt_controller_init(0);
+	//interrupt_controller_init(1);
 	console_clear();
 
 	// Initialize process descriptors as empty
@@ -197,7 +197,11 @@ interrupt(registers_t *reg)
 		current->p_share_amt = reg->reg_eax;
 		current->p_share_left = current->p_share_amt;
 		schedule();
-
+	
+	case INT_SYS_LOTTERY:
+		current->p_lottery_amt = reg->reg_eax;
+		schedule();
+	
 	case INT_CLOCK:
 		// A clock interrupt occurred (so an application exhausted its
 		// time quantum).

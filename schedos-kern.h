@@ -31,6 +31,7 @@ typedef struct process {
 	unsigned int p_priority;	// for 4A
 	unsigned int p_share_amt;	// for 4B
 	unsigned int p_share_left;	
+	unsigned int p_lottery_amt;	// for 7
 
 	procstate_t p_state;		// Process state; see above
 	int p_exit_status;		// Process's exit status

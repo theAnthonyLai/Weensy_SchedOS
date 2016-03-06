@@ -128,7 +128,8 @@ start(void)
 	//   42 = p_share algorithm (exercise 4.b)
 	//    7 = any algorithm that you may implement for exercise 7
 	//scheduling_algorithm = 0;
-	scheduling_algorithm = 2;
+	//scheduling_algorithm = 2;
+	scheduling_algorithm = __EXERCISE_4A__;
 
 	// Switch to the first process.
 	run(&proc_array[1]);
@@ -222,7 +223,9 @@ void
 schedule(void)
 {
 	pid_t pid = current->p_pid;
-
+	unsigned int firstPriority;
+	pid_t firstPid;
+	int i;
 	if (scheduling_algorithm == 0) {
 		while (1) {
 			pid = (pid + 1) % NPROCS;
@@ -241,6 +244,52 @@ schedule(void)
 			pid = (pid + 1) % NPROCS;
 		}
 		// TODO: "blocked and later became runnalbe again"
+	} else if (scheduling_algorithm == __EXERCISE_4A__) {
+		/*if (current->p_state == P_RUNNABLE)
+			pid = current->p_pid;
+		else
+			pid = (pid + 1) % NPROCS;
+
+		firstPriority = proc_array[pid].p_priority;
+		firstPid = pid;
+		for (i = 0; i < NPROCS - 1; i++) {
+			pid = (pid + 1) % NPROCS;
+			if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_priority <= firstPriority) {
+				firstPid = pid;
+				firstPriority = proc_array[pid].p_priority;
+			}
+		}
+		run(&proc_array[firstPid]);
+		
+		if (proc_array[firstPid] == P_RUNNABLE)
+			run(&proc_array[firstPid]);
+		else {
+			pid = (pid + 1) % NPROCS;
+			firstPriority = proc_array[pid].p_priority;
+			firstPid = pid;
+		for (i = 0; i < NPROCS - 1; i++) {
+			pid = (pid + 1) % NPROCS;
+			if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_priority <= firstPriority) {
+				firstPid = pid;
+				firstPriority = proc_array[pid].p_priority;
+			}
+		}
+		}*/
+		
+		//firstPid = pid;
+		//firstPriority = proc_array[pid].p_priority;
+		do {
+			firstPid = pid;
+			firstPriority = proc_array[pid].p_priority;
+			for (i = 0; i < NPROCS-1; i++) {
+				pid = (pid + 1) % NPROCS;
+				if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_priority <= firstPriority) {
+					firstPid = pid;
+					firstPriority = proc_array[pid].p_priority;
+				}
+			}
+		} while (proc_array[firstPid].p_state != P_RUNNABLE);
+		run(&proc_array[firstPid]);
 	}
 	// If we get here, we are running an unknown scheduling algorithm.
 	cursorpos = console_printf(cursorpos, 0x100, "\nUnknown scheduling algorithm %d\n", scheduling_algorithm);

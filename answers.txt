@@ -50,8 +50,8 @@ average wait time: 480 ms
 Exercise 4:
 
 Did you complete Exercise 4A, Exercise 4B, or both for extra credit?
-Completed 4A
-4B in progress
+I completed 4A
+I also tried 4B, and it's partially working.
 
 Exercise 5:
 The first out of order sequence was "12341231234", that means the first interrupt happens at the 4th process and skipping over it's printing.
@@ -64,3 +64,12 @@ Anything else you'd like us to know:
 
 
 Extra credit exercises:
+
+Exercise 7:
+I successfully implemented the lottery scheduling. While the random number I used from read_cycle_counter is a psudo-random number, the output still behaves similar to a true random number.
+Threads can use the system call sys_lottery() to set the number of lottery tickets it has. The greater the number, the more likely that the thread gets picked to run.
+
+Exercise 8:
+I first tried using the atomic_swap function directly, but it didn't quite work. So I decided to implement a print system call instead. This mechanism works because at any given time, there can only be "one kernel" running. Thus, any code executed from within the kernel is guaranteed to guard against race condition. Thus, I implemented a sys_print system call to which the threads call to print characters. Kernel then handle the increment of cursorpos itself and therefore prevent race conditions.
+
+

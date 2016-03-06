@@ -275,12 +275,15 @@ schedule(void)
 		}
 		int hi = 2;
 		while (hi) {
+		
+	cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d\n", pid, proc_array[pid].p_share_amt);
 			firstPid = pid;
 			firstPriority = proc_array[pid].p_share_amt;
 			for (i = 0; i < NPROCS-1; i++) {
 				pid = (pid + 1) % NPROCS;
-	cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d, firstPriority is %d\n", pid, proc_array[pid].p_share_amt, firstPriority);
+	//cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d, firstPriority is %d\n", pid, proc_array[pid].p_share_amt, firstPriority);
 					
+	cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d\n", pid, proc_array[pid].p_share_amt);
 				if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_amt >= firstPriority) {
 					firstPid = pid;
 					firstPriority = proc_array[pid].p_share_amt;

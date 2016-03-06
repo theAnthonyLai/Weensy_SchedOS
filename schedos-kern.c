@@ -115,6 +115,10 @@ start(void)
 
 		// Mark the process as runnable!
 		proc->p_state = P_RUNNABLE;
+
+		// Exercise 7 test
+		// preset everyone to 1 so everyone can start
+		proc->p_lottery_amt = 1;
 	}
 
 	// Initialize the cursor-position shared variable to point to the
@@ -129,10 +133,11 @@ start(void)
 	//   41 = p_priority algorithm (exercise 4.a)
 	//   42 = p_share algorithm (exercise 4.b)
 	//    7 = any algorithm that you may implement for exercise 7
-	scheduling_algorithm = 0;
+	//scheduling_algorithm = 0;
 	//scheduling_algorithm = 2;
 	//scheduling_algorithm = __EXERCISE_4A__;
 	//scheduling_algorithm = __EXERCISE_4B__;
+	scheduling_algorithm = __EXERCISE_7__;
 
 	// Switch to the first process.
 	run(&proc_array[1]);
@@ -187,6 +192,8 @@ interrupt(registers_t *reg)
 		// want to add a system call.
 		/* Your code here (if you want). */
 		//run(current);
+		
+		//cursorpos = console_printf(cursorpos, 0x100, "eax is %d\n", reg->reg_eax);
 		current->p_priority = reg->reg_eax;
 		schedule();
 
@@ -199,6 +206,7 @@ interrupt(registers_t *reg)
 		schedule();
 	
 	case INT_SYS_LOTTERY:
+		//cursorpos = console_printf(cursorpos, 0x100, "eax is %d\n", reg->reg_eax);
 		current->p_lottery_amt = reg->reg_eax;
 		schedule();
 	
@@ -238,6 +246,13 @@ schedule(void)
 	pid_t firstPid;
 	int i;
 	int p_share_reset;	// 4B
+
+	// Exercise 7
+	uint32_t seed;
+	unsigned int lotteryTotal;
+	unsigned int lotteryNum;
+	unsigned int proc_lottery[NPROCS];
+
 	if (scheduling_algorithm == 0) {
 		while (1) {
 			pid = (pid + 1) % NPROCS;
@@ -312,6 +327,37 @@ schedule(void)
 		if (proc_array[firstPid].p_share_left > 0) {
 			proc_array[firstPid].p_share_left--;
 			run(&proc_array[firstPid]);
+		}
+	} else if (scheduling_algorithm == __EXERCISE_7__) {
+		lotteryTotal = 0;
+		for (i = 0; i < NPROCS; i++) {
+			proc_lottery[i] = proc_array[i].p_lottery_amt;
+			lotteryTotal += proc_array[i].p_lottery_amt;
+		}
+		
+		while (1) {
+			seed = (uint32_t) read_cycle_counter();
+			//seed ^= seed >> 11;
+			//seed ^= seed << 7 & 0x9D2C5680;
+			//seed ^= seed << 15 & 0xEFC60000;
+			//seed ^= seed >> 18;
+			/**************
+			Reference from en.cppreference.com/w/app/numeric/random
+			**************/
+			seed ^= seed >> 11 & 0x9908b0df;
+			seed ^= seed << 7 & 0xffffffff;
+			seed ^= seed << 15 & 0x9d2c5680;
+			seed ^= seed >> 18 & 0xefc60000;
+			lotteryNum = seed % lotteryTotal;
+
+			if (lotteryNum < proc_lottery[1] && proc_array[1].p_state == P_RUNNABLE)
+				run(&proc_array[1]);
+			else if (lotteryNum < (proc_lottery[1]+proc_lottery[2]) && proc_array[2].p_state == P_RUNNABLE)
+				run(&proc_array[2]);
+			else if (lotteryNum < (proc_lottery[1]+proc_lottery[2]+proc_lottery[3]) && proc_array[3].p_state == P_RUNNABLE)
+				run(&proc_array[3]);
+			else if (proc_array[4].p_state == P_RUNNABLE)
+				run(&proc_array[4]);
 		}
 	}
 	// If we get here, we are running an unknown scheduling algorithm.

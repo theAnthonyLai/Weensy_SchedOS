@@ -23,7 +23,7 @@ atomic_swap(uint32_t *addr, uint32_t val)
 	int i;
 	//sys_priority(5);
 	//sys_share(2);
-	//sys_lottery(5);
+	//sys_lottery(1);
 	for (i = 0; i < RUNCOUNT; i++) {
 		while(atomic_swap(&cursorposLock, 1));
   50000d:	85 d2                	test   %edx,%edx
@@ -47,7 +47,7 @@ sys_yield(void)
 	int i;
 	//sys_priority(5);
 	//sys_share(2);
-	//sys_lottery(5);
+	//sys_lottery(1);
 	for (i = 0; i < RUNCOUNT; i++) {
   50002f:	40                   	inc    %eax
   500030:	3d 40 01 00 00       	cmp    $0x140,%eax

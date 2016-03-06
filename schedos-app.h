@@ -85,3 +85,11 @@ sys_priority(unsigned int priorityNumber)
  *   IF YOU IMPLEMENT EXERCISE 4.B, NAME YOUR SYSTEM CALL sys_share .
  *
  *****************************************************************************/
+static inline void
+sys_share(unsigned int amt)
+{
+	asm volatile("int %0\n"
+		     : : "i" (INT_SYS_SHARE),
+			 "a" (amt)
+		     : "cc", "memory");
+}

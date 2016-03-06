@@ -129,7 +129,8 @@ start(void)
 	//    7 = any algorithm that you may implement for exercise 7
 	//scheduling_algorithm = 0;
 	//scheduling_algorithm = 2;
-	scheduling_algorithm = __EXERCISE_4A__;
+	//scheduling_algorithm = __EXERCISE_4A__;
+	scheduling_algorithm = __EXERCISE_4B__;
 
 	// Switch to the first process.
 	run(&proc_array[1]);
@@ -187,9 +188,12 @@ interrupt(registers_t *reg)
 		current->p_priority = reg->reg_eax;
 		schedule();
 
-	case INT_SYS_USER2:
+	//case INT_SYS_USER2:
 		/* Your code here (if you want). */
-		run(current);
+		//run(current);
+		current->p_share_amt = reg->reg_eax;
+		current->p_share_left = reg->reg_eax;
+		schedule();
 
 	case INT_CLOCK:
 		// A clock interrupt occurred (so an application exhausted its
@@ -245,39 +249,6 @@ schedule(void)
 		}
 		// TODO: "blocked and later became runnalbe again"
 	} else if (scheduling_algorithm == __EXERCISE_4A__) {
-		/*if (current->p_state == P_RUNNABLE)
-			pid = current->p_pid;
-		else
-			pid = (pid + 1) % NPROCS;
-
-		firstPriority = proc_array[pid].p_priority;
-		firstPid = pid;
-		for (i = 0; i < NPROCS - 1; i++) {
-			pid = (pid + 1) % NPROCS;
-			if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_priority <= firstPriority) {
-				firstPid = pid;
-				firstPriority = proc_array[pid].p_priority;
-			}
-		}
-		run(&proc_array[firstPid]);
-		
-		if (proc_array[firstPid] == P_RUNNABLE)
-			run(&proc_array[firstPid]);
-		else {
-			pid = (pid + 1) % NPROCS;
-			firstPriority = proc_array[pid].p_priority;
-			firstPid = pid;
-		for (i = 0; i < NPROCS - 1; i++) {
-			pid = (pid + 1) % NPROCS;
-			if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_priority <= firstPriority) {
-				firstPid = pid;
-				firstPriority = proc_array[pid].p_priority;
-			}
-		}
-		}*/
-		
-		//firstPid = pid;
-		//firstPriority = proc_array[pid].p_priority;
 		do {
 			firstPid = pid;
 			firstPriority = proc_array[pid].p_priority;
@@ -289,6 +260,29 @@ schedule(void)
 				}
 			}
 		} while (proc_array[firstPid].p_state != P_RUNNABLE);
+		run(&proc_array[firstPid]);
+	} else if (scheduling_algorithm == __EXERCISE_4B__) {
+		while (1) {
+			firstPid = pid;
+			firstPriority = proc_array[pid].p_share_amt;
+			for (i = 0; i < NPROCS-1; i++) {
+				pid = (pid + 1) % NPROCS;
+				if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_amt >= firstPriority) {
+					firstPid = pid;
+					firstPriority = proc_array[pid].p_share_amt;
+				}
+			}
+			
+			// check if it has any share left
+			if (proc_array[firstPid].p_share_left == 0) {
+				proc_array[firstPid].p_share_left = proc_array[firstPid].p_share_amt;
+				pid = (pid + 1) % NPROCS;
+				continue;
+			}
+			
+			if (proc_array[firstPid].p_state == P_RUNNABLE)
+				break;				
+		}
 		run(&proc_array[firstPid]);
 	}
 	// If we get here, we are running an unknown scheduling algorithm.

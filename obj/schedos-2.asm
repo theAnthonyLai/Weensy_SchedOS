@@ -11,12 +11,12 @@ static inline void
 sys_priority(unsigned int priorityNumber)
 {
 	asm volatile("int %0\n"
-  300000:	b8 02 00 00 00       	mov    $0x2,%eax
+  300000:	b8 05 00 00 00       	mov    $0x5,%eax
   300005:	cd 32                	int    $0x32
   300007:	30 c0                	xor    %al,%al
 {
 	int i;
-	sys_priority(2);
+	sys_priority(5);
 	for (i = 0; i < RUNCOUNT; i++) {
 		// Write characters to the console, yielding after each one.
 		*cursorpos++ = PRINTCHAR;
@@ -35,7 +35,7 @@ void
 start(void)
 {
 	int i;
-	sys_priority(2);
+	sys_priority(5);
 	for (i = 0; i < RUNCOUNT; i++) {
   30001f:	40                   	inc    %eax
   300020:	3d 40 01 00 00       	cmp    $0x140,%eax

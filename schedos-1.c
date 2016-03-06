@@ -33,7 +33,7 @@ start(void)
 {
 	int i;
 	//sys_priority(5);
-	sys_share(5);
+	sys_share(3);
 	for (i = 0; i < RUNCOUNT; i++) {
 		// Write characters to the console, yielding after each one.
 		*cursorpos++ = PRINTCHAR;

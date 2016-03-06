@@ -189,10 +189,11 @@ interrupt(registers_t *reg)
 		schedule();
 
 	//case INT_SYS_USER2:
+	case INT_SYS_SHARE:
 		/* Your code here (if you want). */
 		//run(current);
 		current->p_share_amt = reg->reg_eax;
-		current->p_share_left = reg->reg_eax;
+		current->p_share_left = current->p_share_amt;
 		schedule();
 
 	case INT_CLOCK:
@@ -230,6 +231,7 @@ schedule(void)
 	unsigned int firstPriority;
 	pid_t firstPid;
 	int i;
+	int p_share_reset;	// 4B
 	if (scheduling_algorithm == 0) {
 		while (1) {
 			pid = (pid + 1) % NPROCS;
@@ -262,28 +264,46 @@ schedule(void)
 		} while (proc_array[firstPid].p_state != P_RUNNABLE);
 		run(&proc_array[firstPid]);
 	} else if (scheduling_algorithm == __EXERCISE_4B__) {
-		while (1) {
+		// check if we reset all p_share_left
+		p_share_reset = 0;
+		for (i = 1; i < NPROCS; i++)
+			p_share_reset += proc_array[i].p_share_left;
+
+		if (!p_share_reset) {
+			for (i = 0; i < NPROCS; i++)
+				;//proc_array[i].p_share_left = proc_array[i].p_share_amt;
+		}
+		int hi = 2;
+		while (hi) {
 			firstPid = pid;
 			firstPriority = proc_array[pid].p_share_amt;
 			for (i = 0; i < NPROCS-1; i++) {
 				pid = (pid + 1) % NPROCS;
+	cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d, firstPriority is %d\n", pid, proc_array[pid].p_share_amt, firstPriority);
+					
 				if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_amt >= firstPriority) {
 					firstPid = pid;
 					firstPriority = proc_array[pid].p_share_amt;
 				}
 			}
 			
+	//cursorpos = console_printf(cursorpos, 0x100, "\nNow pick pid %i with amt %i\n", firstPid, firstPriority);
 			// check if it has any share left
 			if (proc_array[firstPid].p_share_left == 0) {
-				proc_array[firstPid].p_share_left = proc_array[firstPid].p_share_amt;
+				//proc_array[firstPid].p_share_left = proc_array[firstPid].p_share_amt;
+	cursorpos = console_printf(cursorpos, 0x100, "firstPid is %d, pid is %d\n", firstPid,pid);
 				pid = (pid + 1) % NPROCS;
+				hi--;
 				continue;
 			}
 			
 			if (proc_array[firstPid].p_state == P_RUNNABLE)
 				break;				
 		}
-		run(&proc_array[firstPid]);
+		if (proc_array[firstPid].p_share_left > 0) {
+			proc_array[firstPid].p_share_left--;
+			run(&proc_array[firstPid]);
+		}
 	}
 	// If we get here, we are running an unknown scheduling algorithm.
 	cursorpos = console_printf(cursorpos, 0x100, "\nUnknown scheduling algorithm %d\n", scheduling_algorithm);

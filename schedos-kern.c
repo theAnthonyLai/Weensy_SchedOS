@@ -88,8 +88,8 @@ start(void)
 
 	// Set up hardware (schedos-x86.c)
 	segments_init();
-	interrupt_controller_init(0);
-	//interrupt_controller_init(1);
+	//interrupt_controller_init(0);
+	interrupt_controller_init(1);
 	console_clear();
 
 	// Initialize process descriptors as empty
@@ -138,10 +138,10 @@ start(void)
 	//   41 = p_priority algorithm (exercise 4.a)
 	//   42 = p_share algorithm (exercise 4.b)
 	//    7 = any algorithm that you may implement for exercise 7
-	//scheduling_algorithm = 0;
+	scheduling_algorithm = 0;
 	//scheduling_algorithm = 2;
 	//scheduling_algorithm = __EXERCISE_4A__;
-	scheduling_algorithm = __EXERCISE_4B__;
+	//scheduling_algorithm = __EXERCISE_4B__;
 	//scheduling_algorithm = __EXERCISE_7__;
 
 	// Switch to the first process.
@@ -215,6 +215,10 @@ interrupt(registers_t *reg)
 		current->p_lottery_amt = reg->reg_eax;
 		schedule();
 	
+	case INT_SYS_PRINT:
+		*cursorpos++ = reg->reg_eax;
+		schedule();
+
 	case INT_CLOCK:
 		// A clock interrupt occurred (so an application exhausted its
 		// time quantum).

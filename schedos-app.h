@@ -103,3 +103,11 @@ sys_lottery(unsigned int amt)
 		     : "cc", "memory");
 }
 
+static inline void
+sys_print(uint16_t c)
+{
+	asm volatile("int %0\n"
+		     : : "i" (INT_SYS_PRINT),
+			 "a" (c)
+		     : "cc", "memory");
+}

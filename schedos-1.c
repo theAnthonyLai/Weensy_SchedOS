@@ -19,9 +19,9 @@
 #endif
 
 // UNCOMMENT THE NEXT LINE TO USE EXERCISE 8 CODE INSTEAD OF EXERCISE 6
-// #define __EXERCISE_8__
+#define __EXERCISE_8__
 // Use the following structure to choose between them:
-// #infdef __EXERCISE_8__
+// #ifndef __EXERCISE_8__
 // (exercise 6 code)
 // #else
 // (exercise 8 code)
@@ -36,10 +36,17 @@ start(void)
 	//sys_share(2);
 	//sys_lottery(1);
 	for (i = 0; i < RUNCOUNT; i++) {
-		while(atomic_swap(&cursorposLock, 1));
 		// Write characters to the console, yielding after each one.
-		*cursorpos++ = PRINTCHAR;
-		atomic_swap(&cursorposLock, 0);
+		#ifndef __EXERCISE_8__
+			while(atomic_swap(&cursorposLock, 1));
+			*cursorpos++ = PRINTCHAR;
+		#else
+			sys_print(PRINTCHAR);
+		#endif
+
+		#ifndef __EXERCISE_8__
+			atomic_swap(&cursorposLock, 0);
+		#endif
 		sys_yield();
 	}
 

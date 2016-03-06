@@ -35,8 +35,10 @@ start(void)
 	//sys_priority(5);
 	//sys_share(2);
 	for (i = 0; i < RUNCOUNT; i++) {
+		while(atomic_swap(&cursorposLock, 1));
 		// Write characters to the console, yielding after each one.
 		*cursorpos++ = PRINTCHAR;
+		atomic_swap(&cursorposLock, 0);
 		sys_yield();
 	}
 

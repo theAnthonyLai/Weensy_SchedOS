@@ -88,7 +88,8 @@ start(void)
 
 	// Set up hardware (schedos-x86.c)
 	segments_init();
-	interrupt_controller_init(0);
+	//interrupt_controller_init(0);
+	interrupt_controller_init(1);
 	console_clear();
 
 	// Initialize process descriptors as empty
@@ -119,6 +120,7 @@ start(void)
 	// Initialize the cursor-position shared variable to point to the
 	// console's first character (the upper left).
 	cursorpos = (uint16_t *) 0xB8000;
+	cursorposLock = 0;	// lock is available
 
 	// Initialize the scheduling algorithm.
 	// USE THE FOLLOWING VALUES:
@@ -127,10 +129,10 @@ start(void)
 	//   41 = p_priority algorithm (exercise 4.a)
 	//   42 = p_share algorithm (exercise 4.b)
 	//    7 = any algorithm that you may implement for exercise 7
-	//scheduling_algorithm = 0;
+	scheduling_algorithm = 0;
 	//scheduling_algorithm = 2;
 	//scheduling_algorithm = __EXERCISE_4A__;
-	scheduling_algorithm = __EXERCISE_4B__;
+	//scheduling_algorithm = __EXERCISE_4B__;
 
 	// Switch to the first process.
 	run(&proc_array[1]);

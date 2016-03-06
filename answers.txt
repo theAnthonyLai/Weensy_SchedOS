@@ -50,10 +50,11 @@ average wait time: 480 ms
 Exercise 4:
 
 Did you complete Exercise 4A, Exercise 4B, or both for extra credit?
-
+Completed 4A
+4B in progress
 
 Exercise 5:
-
+The first out of order sequence was "12341231234", that means the first interrupt happens at the 4th process and skipping over it's printing.
 
 (Exercise 6 is a coding exercise)
 

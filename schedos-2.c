@@ -47,7 +47,7 @@ start(void)
 {
 	int i;
 	//sys_priority(5);
-	//sys_share(2);
+	//sys_share(5);
 	//sys_lottery(1);
 	for (i = 0; i < RUNCOUNT; i++) {
 		// Write characters to the console, yielding after each one.

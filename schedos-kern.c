@@ -116,6 +116,11 @@ start(void)
 		// Mark the process as runnable!
 		proc->p_state = P_RUNNABLE;
 
+		// Exercise 4B test
+		// preset everyone to 1 so everyone can start
+		proc->p_share_amt = 1;
+		proc->p_share_left = 1;
+
 		// Exercise 7 test
 		// preset everyone to 1 so everyone can start
 		proc->p_lottery_amt = 1;
@@ -136,8 +141,8 @@ start(void)
 	//scheduling_algorithm = 0;
 	//scheduling_algorithm = 2;
 	//scheduling_algorithm = __EXERCISE_4A__;
-	//scheduling_algorithm = __EXERCISE_4B__;
-	scheduling_algorithm = __EXERCISE_7__;
+	scheduling_algorithm = __EXERCISE_4B__;
+	//scheduling_algorithm = __EXERCISE_7__;
 
 	// Switch to the first process.
 	run(&proc_array[1]);
@@ -289,35 +294,37 @@ schedule(void)
 		p_share_reset = 0;
 		for (i = 1; i < NPROCS; i++)
 			p_share_reset += proc_array[i].p_share_left;
-
+		//cursorpos = console_printf(cursorpos, 0x100, "Total left is %d\n", p_share_reset);
 		if (!p_share_reset) {
 			for (i = 0; i < NPROCS; i++)
-				;//proc_array[i].p_share_left = proc_array[i].p_share_amt;
+				proc_array[i].p_share_left = proc_array[i].p_share_amt;
 		}
-		int hi = 2;
-		while (hi) {
+		//int hi = 10;
+		while (1) {
 		
-	cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d\n", pid, proc_array[pid].p_share_amt);
+	//cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d\n", pid, proc_array[pid].p_share_amt);
 			firstPid = pid;
 			firstPriority = proc_array[pid].p_share_amt;
 			for (i = 0; i < NPROCS-1; i++) {
 				pid = (pid + 1) % NPROCS;
 	//cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d, firstPriority is %d\n", pid, proc_array[pid].p_share_amt, firstPriority);
 					
-	cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d\n", pid, proc_array[pid].p_share_amt);
-				if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_amt >= firstPriority) {
+	//cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d\n", pid, proc_array[pid].p_share_amt);
+				if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_left > 0 && proc_array[pid].p_share_amt > firstPriority) {
 					firstPid = pid;
 					firstPriority = proc_array[pid].p_share_amt;
 				}
 			}
 			
-	//cursorpos = console_printf(cursorpos, 0x100, "\nNow pick pid %i with amt %i\n", firstPid, firstPriority);
+	//cursorpos = console_printf(cursorpos, 0x100, "Now pick pid %i with amt %i\n", firstPid, firstPriority);
 			// check if it has any share left
-			if (proc_array[firstPid].p_share_left == 0) {
+			if (proc_array[firstPid].p_share_left == 0 || proc_array[firstPid].p_state != P_RUNNABLE) {
 				//proc_array[firstPid].p_share_left = proc_array[firstPid].p_share_amt;
-	cursorpos = console_printf(cursorpos, 0x100, "firstPid is %d, pid is %d\n", firstPid,pid);
-				pid = (pid + 1) % NPROCS;
-				hi--;
+	//cursorpos = console_printf(cursorpos, 0x100, "firstPid is %d, pid is %d\n", firstPid,pid);
+				//cursorpos = console_printf(cursorpos, 0x100, "pid %d is done\n", firstPid);
+				pid = (firstPid + 1) % NPROCS;
+				//cursorpos = console_printf(cursorpos, 0x100, "try pid %d\n", pid);
+				//hi--;
 				continue;
 			}
 			

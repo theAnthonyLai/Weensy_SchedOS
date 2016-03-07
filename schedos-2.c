@@ -28,9 +28,9 @@
  *
  *****************************************************************************/
 
-//#ifndef PRINTCHAR
-//#define PRINTCHAR	('2' | 0x0A00)
-//#endif
+#ifndef PRINTCHAR
+#define PRINTCHAR	('2' | 0x0A00)
+#endif
 
 // UNCOMMENT THE NEXT LINE TO USE EXERCISE 8 CODE INSTEAD OF EXERCISE 6
 // #define __EXERCISE_8__
@@ -47,7 +47,7 @@ start(void)
 {
 	int i;
 	//sys_priority(5);
-	//sys_share(5);
+	sys_share(1);
 	//sys_lottery(1);
 	for (i = 0; i < RUNCOUNT; i++) {
 		// Write characters to the console, yielding after each one.

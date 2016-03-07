@@ -88,8 +88,8 @@ start(void)
 
 	// Set up hardware (schedos-x86.c)
 	segments_init();
-	//interrupt_controller_init(0);
-	interrupt_controller_init(1);
+	interrupt_controller_init(0);
+	//interrupt_controller_init(1);
 	console_clear();
 
 	// Initialize process descriptors as empty
@@ -138,10 +138,10 @@ start(void)
 	//   41 = p_priority algorithm (exercise 4.a)
 	//   42 = p_share algorithm (exercise 4.b)
 	//    7 = any algorithm that you may implement for exercise 7
-	scheduling_algorithm = 0;
+	//scheduling_algorithm = 0;
 	//scheduling_algorithm = 2;
 	//scheduling_algorithm = __EXERCISE_4A__;
-	//scheduling_algorithm = __EXERCISE_4B__;
+	scheduling_algorithm = __EXERCISE_4B__;
 	//scheduling_algorithm = __EXERCISE_7__;
 
 	// Switch to the first process.
@@ -294,51 +294,44 @@ schedule(void)
 		} while (proc_array[firstPid].p_state != P_RUNNABLE);
 		run(&proc_array[firstPid]);
 	} else if (scheduling_algorithm == __EXERCISE_4B__) {
-		// check if we reset all p_share_left
-		p_share_reset = 0;
-		for (i = 1; i < NPROCS; i++)
-			p_share_reset += proc_array[i].p_share_left;
-		//cursorpos = console_printf(cursorpos, 0x100, "Total left is %d\n", p_share_reset);
-		if (!p_share_reset) {
-			for (i = 0; i < NPROCS; i++)
-				proc_array[i].p_share_left = proc_array[i].p_share_amt;
-		}
-		//int hi = 10;
-		while (1) {
-		
-	//cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d\n", pid, proc_array[pid].p_share_amt);
-			firstPid = pid;
-			firstPriority = proc_array[pid].p_share_amt;
-			for (i = 0; i < NPROCS-1; i++) {
-				pid = (pid + 1) % NPROCS;
-	//cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d, firstPriority is %d\n", pid, proc_array[pid].p_share_amt, firstPriority);
-					
-	//cursorpos = console_printf(cursorpos, 0x100, "pid %d has amt %d\n", pid, proc_array[pid].p_share_amt);
-				if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_left > 0 && proc_array[pid].p_share_amt > firstPriority) {
+		if (proc_array[pid].p_share_left > 0 && proc_array[pid].p_state == P_RUNNABLE) {
+			proc_array[pid].p_share_left--;
+			run(&proc_array[pid]);
+		} else {
+			while(1) {
+				// first find a process that's runnable
+				for (i = 0; i < NPROCS - 1; i++) {
+					pid = (pid + 1) % NPROCS;
+					if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_left > 0)
+						break;
+				}
+				
+				if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_left > 0) {
+					// there's at least one runnalbe, check share priority
 					firstPid = pid;
 					firstPriority = proc_array[pid].p_share_amt;
+					
+					for (i = 0; i < NPROCS - 1; i++) {
+						pid = (pid + 1) % NPROCS;
+						if (proc_array[pid].p_state == P_RUNNABLE && proc_array[pid].p_share_left > 0 && proc_array[pid].p_share_amt > firstPriority) {
+							firstPid = pid;
+							firstPriority = proc_array[pid].p_share_amt;
+						}
+					}
+					
+					proc_array[firstPid].p_share_left--;
+					run(&proc_array[firstPid]);
+				} else {
+					// nothing runnable
+					// reset p_share_left
+					for (i = 1; i < NPROCS; i++)
+						proc_array[i].p_share_left = proc_array[i].p_share_amt;
 				}
+				
+				//if (proc_array[firstPid].p_state == P_RUNNABLE && proc_array[firstPid]
 			}
-			
-	//cursorpos = console_printf(cursorpos, 0x100, "Now pick pid %i with amt %i\n", firstPid, firstPriority);
-			// check if it has any share left
-			if (proc_array[firstPid].p_share_left == 0 || proc_array[firstPid].p_state != P_RUNNABLE) {
-				//proc_array[firstPid].p_share_left = proc_array[firstPid].p_share_amt;
-	//cursorpos = console_printf(cursorpos, 0x100, "firstPid is %d, pid is %d\n", firstPid,pid);
-				//cursorpos = console_printf(cursorpos, 0x100, "pid %d is done\n", firstPid);
-				pid = (firstPid + 1) % NPROCS;
-				//cursorpos = console_printf(cursorpos, 0x100, "try pid %d\n", pid);
-				//hi--;
-				continue;
-			}
-			
-			if (proc_array[firstPid].p_state == P_RUNNABLE)
-				break;				
 		}
-		if (proc_array[firstPid].p_share_left > 0) {
-			proc_array[firstPid].p_share_left--;
-			run(&proc_array[firstPid]);
-		}
+
 	} else if (scheduling_algorithm == __EXERCISE_7__) {
 		lotteryTotal = 0;
 		for (i = 0; i < NPROCS; i++) {

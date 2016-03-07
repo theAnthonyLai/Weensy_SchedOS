@@ -987,7 +987,7 @@ start(void)
   1004b3:	83 fe 04             	cmp    $0x4,%esi
   1004b6:	75 ba                	jne    100472 <start+0x9e>
 	//scheduling_algorithm = __EXERCISE_4A__;
-	scheduling_algorithm = __EXERCISE_4B__;
+	//scheduling_algorithm = __EXERCISE_4B__;
 	//scheduling_algorithm = __EXERCISE_7__;
 
 	// Switch to the first process.
@@ -1005,14 +1005,16 @@ start(void)
 	cursorposLock = 0;	// lock is available
   1004ca:	c7 05 10 80 19 00 00 	movl   $0x0,0x198010
   1004d1:	00 00 00 
+	//    0 = the initial algorithm
+	//    2 = strict priority scheduling (exercise 2)
+	//   41 = p_priority algorithm (exercise 4.a)
 	//   42 = p_share algorithm (exercise 4.b)
 	//    7 = any algorithm that you may implement for exercise 7
-	//scheduling_algorithm = 0;
-	//scheduling_algorithm = 2;
-	//scheduling_algorithm = __EXERCISE_4A__;
-	scheduling_algorithm = __EXERCISE_4B__;
-  1004d4:	c7 05 98 78 10 00 2a 	movl   $0x2a,0x107898
+	scheduling_algorithm = 0;
+  1004d4:	c7 05 98 78 10 00 00 	movl   $0x0,0x107898
   1004db:	00 00 00 
+	//scheduling_algorithm = __EXERCISE_4A__;
+	//scheduling_algorithm = __EXERCISE_4B__;
 	//scheduling_algorithm = __EXERCISE_7__;
 
 	// Switch to the first process.

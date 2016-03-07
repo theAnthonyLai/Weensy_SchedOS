@@ -28,9 +28,9 @@
  *
  *****************************************************************************/
 
-#ifndef PRINTCHAR
-#define PRINTCHAR	('2' | 0x0A00)
-#endif
+//#ifndef PRINTCHAR
+//#define PRINTCHAR	('2' | 0x0A00)
+//#endif
 
 // UNCOMMENT THE NEXT LINE TO USE EXERCISE 8 CODE INSTEAD OF EXERCISE 6
 // #define __EXERCISE_8__
